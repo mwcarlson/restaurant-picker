@@ -30,7 +30,7 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 # RabbitMQ setup
-RABBITMQ_HOST = os.getenv('RABBITMQ_HOST')
+RABBITMQ_HOST = os.getenv('CLOUDAMQP_URL')
 connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
 channel = connection.channel()
 

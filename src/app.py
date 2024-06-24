@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import pika, json, threading
 
@@ -6,8 +8,9 @@ app = Flask(__name__)
 latest_restaurant_data = None
 
 def rabbitmq_consumer():
+    RABBITMQ_HOST = os.getenv('CLOUDAMQP_URL')
     connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host='localhost')  # Adjust as needed
+        pika.ConnectionParameters(host=RABBITMQ_HOST)
     )
     channel = connection.channel()
 
