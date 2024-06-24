@@ -9,9 +9,8 @@ latest_restaurant_data = None
 
 def rabbitmq_consumer():
     RABBITMQ_HOST = os.getenv('CLOUDAMQP_URL')
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host=RABBITMQ_HOST)
-    )
+    params = pika.URLParameters(RABBITMQ_HOST)
+    connection = pika.BlockingConnection(params)
     channel = connection.channel()
 
     channel.queue_declare(queue='frontend_queue', durable=True)
@@ -74,7 +73,8 @@ def fetch_data():
 def send_preferences(zip_code, distance, keyword):
     # Setup RabbitMQ Connection
     RABBITMQ_HOST = os.getenv('CLOUDAMQP_URL')
-    connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
+    params = pika.URLParameters(RABBITMQ_HOST)
+    connection = pika.BlockingConnection(params)
     channel = connection.channel()
     channel.queue_declare(queue='task_queue', durable=True)
 

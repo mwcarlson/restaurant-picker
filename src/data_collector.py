@@ -31,7 +31,8 @@ session = Session()
 
 # RabbitMQ setup
 RABBITMQ_HOST = os.getenv('CLOUDAMQP_URL')
-connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
+params = pika.URLParameters(RABBITMQ_HOST)
+connection = pika.BlockingConnection(params)
 channel = connection.channel()
 
 channel.queue_declare(queue='task_queue', durable=True)
@@ -78,7 +79,8 @@ def fetch_and_store(zip_code, distance, keyword):
 
 def send_info_to_analyzer(zip_code, distance, keyword):
     RABBITMQ_HOST = os.getenv('CLOUDAMQP_URL')
-    connection_ = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
+    params = pika.URLParameters(RABBITMQ_HOST)
+    connection_ = pika.BlockingConnection(params)
     channel_ = connection_.channel()
     channel_.queue_declare(queue='analysis_queue', durable=True)
 

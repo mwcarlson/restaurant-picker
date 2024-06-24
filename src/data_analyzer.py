@@ -29,7 +29,8 @@ class Restaurant(Base):
 
 # Setup RabbitMQ connection
 RABBITMQ_HOST = os.getenv('CLOUDAMQP_URL')
-connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
+params = pika.URLParameters(RABBITMQ_HOST)
+connection = pika.BlockingConnection(params)
 channel = connection.channel()
 
 channel.queue_declare(queue='analysis_queue', durable=True)
