@@ -64,6 +64,7 @@ def index():
 
 @app.route('/results')
 def results():
+    global latest_restaurant_data
     # This route will be refreshed by AJAX to display results
     if latest_restaurant_data:
         return render_template('results.html', restaurant=latest_restaurant_data)
@@ -73,6 +74,7 @@ def results():
 
 @app.route('/fetch-data')
 def fetch_data():
+    global latest_restaurant_data
     if latest_restaurant_data:
         print("fetch data success")
         return jsonify(latest_restaurant_data)
