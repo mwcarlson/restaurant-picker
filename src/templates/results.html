@@ -1,11 +1,35 @@
+<!-- templates/results.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Restaurant Results</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        function fetchData() {
+            $.get('/fetch-data', function(data) {
+                if (data.name) {
+                    $('#restaurantName').text(data.name);
+                    $('#restaurantAddress').text(data.address);
+                    $('#restaurantLocation').text('Latitude: ' + data.latitude + ', Longitude: ' + data.longitude);
+                } else {
+                    $('#restaurantName').text('Waiting for data...');
+                    setTimeout(fetchData, 100);
+                }
+            });
+        }
+        fetchData(); // Initial call to fetch data
+    });
+    </script>
 </head>
 <body>
-    <h1>Results</h1>
-    <div id="results">Results will be displayed here...</div>
+    <h1>Your Random Restaurant Details</h1>
+    <div>
+        <h2 id="restaurantName">Loading...</h2>
+        <p id="restaurantAddress"></p>
+        <p id="restaurantLocation"></p>
+    </div>
+    <button onclick="window.location.href='/'" style="margin-top: 20px;">Back to Search</button>
 </body>
 </html>
-

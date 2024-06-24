@@ -1,33 +1,81 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
-import pika, json
+import pika, json, threading
 
 app = Flask(__name__)
+
+latest_restaurant_data = None
+
+def rabbitmq_consumer():
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host='localhost')  # Adjust as needed
+    )
+    channel = connection.channel()
+
+    channel.queue_declare(queue='frontend_queue', durable=True)
+
+    def on_message_received(ch, method, properties, body):
+        global latest_restaurant_data
+        try:
+            # Decode the restaurant data
+            latest_restaurant_data = json.loads(body)
+            print("Updated restaurant data received")
+        except json.JSONDecodeError as e:
+            print("Failed to decode message: ", e)
+        finally:
+            # Acknowledge the message
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+
+    channel.basic_consume(queue='frontend_queue', on_message_callback=on_message_received, auto_ack=False)
+    app.logger.info("Starting RabbitMQ consumer")
+    channel.start_consuming()
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        # User form input
-        distance = request.form.get('distance', type=int)
-        food_type = request.form.get('food_type')
+        zip_code = request.form.get('zip')
+        distance_miles = request.form.get('distance')
+        # Convert miles to meters (1 mile is approximately 1609 meters)
+        distance_meters = int(distance_miles) * 1609.34
 
-        # Send data to data collector via RabbitMQ
-        send_preferences(distance, food_type)
+        keyword = request.form.get('keyword')
+        #excluded_cuisines = request.form.getlist('exclude_cuisine')
+        #print("Excluded Cuisines:", excluded_cuisines)
+        #print("Distance in Meters:", distance_meters)
+
+        global latest_restaurant_data
+        latest_restaurant_data = None
+
+        send_preferences(zip_code, distance_meters, keyword)
+
         return redirect(url_for('results'))
     return render_template('index.html')
 
 @app.route('/results')
 def results():
     # This route will be refreshed by AJAX to display results
-    return render_template('results.html')
+    if latest_restaurant_data:
+        return render_template('results.html', restaurant=latest_restaurant_data)
+    else:
+        return render_template('results.html', restaurant={"error": "No data available yet."})
+    #return render_template('results.html')
 
-def send_preferences(distance, food_type):
+@app.route('/fetch-data')
+def fetch_data():
+    if latest_restaurant_data:
+        print("fetch data success")
+        return jsonify(latest_restaurant_data)
+    else:
+        print("fetch data failure")
+        return jsonify({"error": "No data available yet."})
+
+def send_preferences(zip_code, distance, keyword):
     # Setup RabbitMQ Connection
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     channel = connection.channel()
     channel.queue_declare(queue='task_queue', durable=True)
 
     # Send the message
-    message = json.dumps({'distance': distance, 'food_type': food_type})
+    message = json.dumps({'zip': zip_code, 'distance': distance, 'keyword': keyword})
     channel.basic_publish(
         exchange='',
         routing_key='task_queue',
@@ -39,5 +87,6 @@ def send_preferences(distance, food_type):
     connection.close()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    threading.Thread(target=rabbitmq_consumer, daemon=True).start()
+    app.run(debug=True, use_reloader=False)
 
