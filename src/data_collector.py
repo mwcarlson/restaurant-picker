@@ -10,8 +10,14 @@ from dotenv import load_dotenv
 load_dotenv()  # This will load the environment variables from the .env file
 
 # Database setup
-DATABASE_URI = os.getenv('DATABASE_URL')
-engine = create_engine(DATABASE_URI)
+database_url = os.environ.get('DATABASE_URL')
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+# Heroku requires SSL for PostgreSQL
+database_url = database_url + "?sslmode=require"
+engine = create_engine(database_url)
+
 Base = declarative_base()
 
 class Restaurant(Base):

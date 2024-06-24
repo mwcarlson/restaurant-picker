@@ -6,6 +6,7 @@ click==8.1.7
 factory-boy==3.3.0
 Faker==25.9.1
 Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
 Flask-Testing==0.8.1
 greenlet==3.0.3
 gunicorn==22.0.0
