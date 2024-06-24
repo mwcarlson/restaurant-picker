@@ -71,7 +71,6 @@ def fetch_and_store(zip_code, distance, keyword):
             distance=distance,
             keyword=keyword
         )
-        #print("Inserting restaurant: ", restaurant)
         session.add(restaurant)
     session.commit()
     print("Restaurants stored to DB")

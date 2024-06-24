@@ -1,7 +1,6 @@
 import os
 import json
 import pika
-#import random
 from sqlalchemy import create_engine, Column, Integer, String, Float, select
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
