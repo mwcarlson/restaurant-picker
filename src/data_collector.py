@@ -77,7 +77,8 @@ def fetch_and_store(zip_code, distance, keyword):
     send_info_to_analyzer(zip_code, distance, keyword)
 
 def send_info_to_analyzer(zip_code, distance, keyword):
-    connection_ = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    RABBITMQ_HOST = os.getenv('CLOUDAMQP_URL')
+    connection_ = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
     channel_ = connection_.channel()
     channel_.queue_declare(queue='analysis_queue', durable=True)
 

@@ -73,7 +73,8 @@ def fetch_data():
 
 def send_preferences(zip_code, distance, keyword):
     # Setup RabbitMQ Connection
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    RABBITMQ_HOST = os.getenv('CLOUDAMQP_URL')
+    connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
     channel = connection.channel()
     channel.queue_declare(queue='task_queue', durable=True)
 
