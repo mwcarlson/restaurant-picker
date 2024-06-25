@@ -2,7 +2,7 @@ import unittest
 import json
 import pika
 from unittest.mock import patch, MagicMock
-from src.data_analyzer import select_random_restaurant, callback, send_result_to_frontend
+from data_analyzer import select_random_restaurant, callback, send_result_to_frontend
 
 
 class TestDataAnalyzer(unittest.TestCase):

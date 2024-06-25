@@ -1,7 +1,7 @@
 import json
 import pytest
-from src.data_collector import session, Base, engine, Restaurant
-from src.app import app as flask_app
+from data_collector import session, Base, engine, Restaurant
+from app import app as flask_app
 from pika import BlockingConnection, ConnectionParameters
 from sqlalchemy import create_engine
 from factory.alchemy import SQLAlchemyModelFactory

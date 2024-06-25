@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from src.data_collector import fetch_and_store, geocode_zip, send_info_to_analyzer
+from data_collector import fetch_and_store, geocode_zip, send_info_to_analyzer
 
 class TestDataCollector(unittest.TestCase):
     @patch('data_collector.requests.get')
